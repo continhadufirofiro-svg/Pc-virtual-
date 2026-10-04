@@ -1,0 +1,26 @@
+pkg update -y
+pkg upgrade -y
+pkg install qemu-system-x86-64-headless qemu-utils -y
+
+termux-setup-storage
+
+mkdir -p ~/windows10
+cd ~/windows10
+
+# Cria um disco virtual de 64 GB
+qemu-img create -f qcow2 windows10.qcow2 64G
+
+# Inicia a instalação do Windows 10
+qemu-system-x86_64 \
+  -m 4096 \
+  -smp 4 \
+  -cpu max \
+  -machine q35 \
+  -drive file=windows10.qcow2,if=virtio,format=qcow2 \
+  -cdrom /sdcard/Download/Windows10.iso \
+  -boot order=d \
+  -vga std \
+  -device ich9-intel-hda \
+  -device hda-duplex \
+  -netdev user,id=net0 \
+  -device e1000,netdev=net0
